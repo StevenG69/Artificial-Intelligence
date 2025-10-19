@@ -65,3 +65,100 @@ Climate drivers used as input features: **ENSO**, **TSA**, **TNA**, and **NAO** 
 - **Evaluation**:
   - Same metrics: Pearson `r` and MAE
   - Training plot: Loss vs. epochs (train + validation)
+
+
+# Project RL – Reinforcement Learning: Q-learning vs SARSA with Teacher Guidance
+
+---
+
+## 🎯 Objective
+
+Implement and compare **Q-learning** and **SARSA** in an 11×11 grid world, then extend both with a **teacher-student interactive reinforcement learning (IntRL)** framework where pre-trained agents provide probabilistic advice to new learners.
+
+---
+
+## 🌍 Environment (`env.py`)
+
+- **Grid size**: 11 × 11  
+- **Goal**: Fixed at `(10, 10)` → **+25 reward**  
+- **Obstacles** (10 cells):
+  - L-shape: `(2,2)`, `(2,3)`, `(2,4)`, `(3,2)`, `(4,2)`  
+  - Cross: `(5,4)`, `(5,5)`, `(5,6)`, `(4,5)`, `(6,5)` → **–10 penalty**  
+- **Step cost**: –1 per move  
+- Agent starts at random non-obstacle, non-goal position.
+
+---
+
+## ⚙️ Shared Hyperparameters (All Tasks)
+
+Use **identical settings** across all tasks for fair comparison:
+- **Learning rate (α)**: 0.1 – 0.5  
+- **Discount factor (γ)**: 0.9 – 0.99  
+- **Epsilon**:  
+  - With decay: start 0.8–1.0 → end 0.01–0.1  
+  - Or fixed: 0.1–0.3  
+- **Episodes**: 300–1000 (fewer allowed in teacher tasks if justified)  
+- **Max steps/episode**: 50–100  
+- **Random seed**: Set for reproducibility
+
+---
+
+## 📋 Tasks
+
+### ✅ Task 1: Q-learning
+- Implement **Q-learning** with ε-greedy action selection.
+- Track per episode: total reward, steps, success (reached goal).
+- **Outputs**:
+  - Plot: episode rewards + 50-episode moving average + y=0 line
+  - Metrics: Success Rate, Avg Reward, Avg Learning Speed
+  - Save trained Q-table (for Task 3)
+
+### ✅ Task 2: SARSA
+- Implement **SARSA** using **same hyperparameters** as Task 1.
+- Same metrics and plotting requirements.
+- Save trained Q-table (for Task 4)
+
+### ✅ Task 3: Q-learning with Teacher
+- Load Q-table from Task 1 as **teacher**.
+- New Q-learning **student** receives advice via:
+  - **Availability** ∈ `[0.1, 0.3, 0.5, 0.7, 1.0]`
+  - **Accuracy** ∈ `[0.1, 0.3, 0.5, 0.7, 1.0]`
+- Advice logic:
+  - If advice given **and correct** → follow teacher’s best action
+  - If advice given **but incorrect** → random action ≠ teacher’s best
+  - Else → ε-greedy as usual
+- **Output**: Heatmap of **Avg Reward** vs (Availability, Accuracy)
+
+### ✅ Task 4: SARSA with Teacher
+- Same as Task 3, but using SARSA teacher (from Task 2) and SARSA student.
+- Same parameter grid and heatmap output.
+
+---
+
+## 🔍 Analysis
+
+### Baseline Comparison
+- Side-by-side plots: Q-learning vs SARSA
+  - Episode rewards (smoothed)
+  - Rolling success rates (50-episode window)
+
+### Teacher Impact Analysis
+- **For Q-learning (8 marks)**: Analyze how availability/accuracy affect learning curves, convergence, and robustness.
+- **For SARSA (8 marks)**: Same analysis.
+- Include plots comparing baseline vs teacher-guided runs at key configurations (e.g., availability = 0.1, 0.5, 1.0).
+
+### Teacher Effectiveness Summary
+- Comparative visualisations showing:
+  - How both algorithms respond to teacher guidance
+  - Optimal teacher settings
+  - Which algorithm benefits more from advice
+
+---
+
+## 🧮 Evaluation Metrics
+
+- **Success Rate** = (Successful Episodes / Total) × 100%  
+- **Average Reward** = Σ(Rewardᵢ) / N  
+- **Average Learning Speed** = 1 / (Σ(Stepsᵢ) / N)
+
+---
